@@ -1,0 +1,41 @@
+!pip install fastf1
+import numpy as np
+
+import fastf1
+
+# Carregando os dados de uma corrida específica
+corrida = input("Informe a cidade do Grand Prix desejado: ")
+ano = int(input("Informe o ano da corrida: "))
+seção = input("Informe a seção no formato 'Q' para qualificação ou 'R' para corrida: ")
+session = fastf1.get_session(ano, corrida, seção)
+session.load()
+
+# Escolhendo um piloto
+piloto = input("Informe o piloto desejado no formato tipo 'LEC': ")
+fast_piloto = session.laps.pick_driver(piloto).pick_fastest()
+
+# Obtendo os tempos de volta
+tempos_de_volta = fast_piloto.get_car_data()['Time']
+
+# Convertendo os tempos de volta para segundos
+tempos_de_volta_em_segundos = [t.total_seconds() for t in tempos_de_volta]
+
+# Calculando a média dos tempos de volta
+media = float(sum(tempos_de_volta_em_segundos) / len(tempos_de_volta_em_segundos))
+
+# Definindo um limite para consistência
+limite_consistencia = 0.5
+
+# Voltas dentro do limite de consistencia
+voltas_dentro_do_limite = 0
+
+# Verificando se os tempos de volta estão dentro do limite de consistência
+
+for volta, tempo in enumerate(tempos_de_volta, start=1):
+  tempo_em_segundo = (tempo.total_seconds())
+  if np.abs(tempo_em_segundo - media) > limite_consistencia:
+        print(f"Volta {volta}: Tempo {tempo_em_segundo:.2f} segundos (fora do limite de consistência)")
+  else:
+        print(f"Volta {volta}: Tempo {tempo_em_segundo:.2f} segundos")
+        voltas_dentro_do_limite += 1
+print("Total de voltas dentro do limites: ", voltas_dentro_do_limite)
